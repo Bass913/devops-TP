@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-flask-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: my-flask-app
+  template:
+    metadata:
+      labels:
+        app: my-flask-app
+    spec:
+      containers:
+        - name: flask-container
+          image: acresgi<votre_nom>.azurecr.io/flask-app:latest
+          ports:
+            - containerPort: 8000
+          env:
+            - name: REDIS_SERVER
+              value: "redis-svc"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-flask-service
+spec:
+  selector:
+    app: my-flask-app
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 8000
+  type: ClusterIP
